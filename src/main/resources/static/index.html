@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/css/materialize.min.css">
+  <title>Document</title>
+  <style>
+        .chat_msg {
+            color: white;
+            padding: 0.5rem;
+            margin: 0.5rem;
+            display: inline-block;
+            border-radius: 0.5rem;
+            background-color: #ff9100;
+            z-index: 5;
+            position: relative !important;
+        }
+
+        #chat_div {
+            height: 80vh;
+            font-size: 1.3rem;
+            padding: 1.5rem;
+            overflow-y: scroll !important;
+            color: white;
+            position: relative !important;
+            width: 100% !important;
+        }
+
+        .input-field input[type=text]:focus+label {
+            color: #ff9100 !important;
+        }
+
+        .input-field input:focus {
+            border-bottom: 1px solid #ff9100 !important;
+            box-shadow: 0 1px 0 0 #ff9100 !important;
+        }
+
+        .input-field input {
+            color: white;
+        }
+
+
+
+
+        .watermark {
+            pointer-events: none;
+            display: block;
+            position: fixed;
+            width: 50%;
+            opacity: 0.3;
+            z-index: 1;
+            height: auto;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .bg_login {
+
+            background-image: linear-gradient(to top, #263238 0%, #37474f 100%);
+        }
+    </style>
+</head>
+
+<body class="bg_login">
+
+
+
+<div id="vue-app">
+  <div class="valign-wrapper" style="height: 100vh !important;">
+    <div class="row" style="width:100% !important">
+      <div class="col s10 offset-s1 m6 offset-m3 l4 offset-l4">
+        <div class="card blue-grey darken-4 z-depth-5">
+
+          <div class="card-content white-text">
+            <div class="center-align row">
+              <img height="100px" src="https://static.toro.io/marketplace/organisations/organisation_1.png" alt="">
+              <span class="grey-text text-lighten-1 ">
+                                    <h4>Pair Programming</h4>
+                                    <p>v0.01 SNAPSHOT</p>
+                                </span>
+            </div>
+
+            <form id="loginUserForm">
+              <div class="input-field">
+                <label for="">Email</label>
+                <input v-model="loginUserForm.email" type="text" class="white-text">
+              </div>
+
+              <div class="input-field">
+                <label for="">Password</label>
+                <input v-model="loginUserForm.password" type="password" class="white-text">
+              </div>
+            </form>
+
+          </div>
+
+          <div class="card-action">
+            <button data-target="registerUserModal" class="btn modal-trigger left gray-text waves-effect orange accent-3">Register</button>
+            <button @click="loginUser()" class="btn right gray-text waves-effect orange accent-3">Login</button>
+            <br>
+            <br>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Modal Structure -->
+    <div id="registerUserModal" class="modal blue-grey darken-3 white-text">
+      <div class="modal-content ">
+        <div class="row">
+          <div class="col s12 m12 l12 center">
+            <img class="center" height="100px" src="https://static.toro.io/marketplace/organisations/organisation_1.png" alt="">
+          </div>
+
+
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="col s12 m12 l12">
+          <h5>Register User</h5>
+          <br>
+        </div>
+
+        <form id="registerUserForm">
+          <div class="row ">
+
+            <div class="col s12 m6 l6 input-field">
+              <label for="">First Name</label>
+              <input v-model="registerUserForm.firstName" type="text">
+            </div>
+            <div class="col s12 m6 l6 input-field">
+              <label for="">Last Name</label>
+              <input v-model="registerUserForm.lastName" type="text">
+            </div>
+
+          </div>
+
+          <div class="row ">
+
+            <div class="col s12 m6 l6 input-field">
+              <label for="">Email</label>
+              <input v-model="registerUserForm.email" type="text">
+            </div>
+            <div class="col s12 m6 l6 input-field">
+              <label for="">Password</label>
+              <input v-model="registerUserForm.password" type="password">
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer blue-grey darken-3">
+        <button @click="registerUser()" class="btn waves-effect waves-effect orange accent-3">Send</button>
+      </div>
+    </div>
+
+
+  </div>
+
+</div>
+
+
+<!-- end of vue-app -->
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/js/materialize.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.rawgit.com/auth0/jwt-decode/master/build/jwt-decode.min.js"></script>
+<script>
+    function initialData() {
+        return {
+            registerUserForm: {
+                firstName: "",
+                lastName: "",
+                email: "",
+                password: ""
+            },
+            loginUserForm: {
+                email: "",
+                password: ""
+            }
+        }
+    }
+
+    new Vue({
+        el: "#vue-app",
+
+        data: initialData,
+
+        methods: {
+            init() {
+                M.Modal.init(document.querySelector('.modal'));
+            },
+            registerUser() {
+                axios({
+                        method: 'post',
+                        url: '/api/v1/users/register',
+                        data: JSON.stringify(this.registerUserForm),
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then((res) => {
+                        this.closeModal(".modal");
+                        this.resetObject(this.registerUserForm, initialData().registerUserForm);
+                        this.makeToast("Registration successfull", "orange accent-3");
+                        console.log(JSON.stringify(this.registerUserForm));
+                    })
+                    .catch((err) => {
+                        //var errorMessage = err.response.data.message;
+                        var errorMessage = "Incomplete data";
+                        this.makeToast(errorMessage, "red darken-1");
+                    });
+
+            },
+            loginUser() {
+                axios({
+                        method: 'post',
+                        url: '/api/v1/auth/login',
+                        data: JSON.stringify(this.loginUserForm),
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then((res) => {
+
+                        var token = JSON.stringify({accessToken : res.data.accessToken});
+                        var user = JSON.parse(jwt_decode(token).sub);
+
+                        localStorage.setItem('token',  token );
+                        localStorage.setItem('user',  JSON.stringify(user) );
+
+                        this.resetObject(this.loginUserForm, initialData().loginUserForm);
+                        //this.makeToast("Login successfull, this should redirect you to the dashboard ","orange accent-3");
+                        window.location = "/projects";
+
+                    })
+                    .catch((err) => {
+                        console.dir(err);
+                        var errorMessage = err  ;
+                        this.makeToast(errorMessage, "red darken-1");
+                    });
+            },
+
+            //utils
+            resetObject(newObject, oldObject) {
+                Object.assign(newObject, oldObject);
+            },
+            closeModal(modalClass) {
+                M.Modal.getInstance(document.querySelector(modalClass)).close();
+            },
+            makeToast(message, style) {
+                M.toast({
+                    html: message,
+                    classes: style
+                });
+            }
+        },
+
+        mounted() {
+            this.init();
+        }
+
+    });
+</script>

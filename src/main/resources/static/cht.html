@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/css/materialize.min.css">
+  <title>Document</title>
+  <style>
+        .chat_msg {
+            color: white;
+            padding: 0.5rem;
+            margin: 0.5rem;
+            display: inline-block;
+            border-radius: 0.5rem;
+            background-color: #ff9100;
+            z-index: 5;
+            position: relative !important;
+        }
+
+        #chat_div {
+            height: 80vh;
+            font-size: 1.3rem;
+            padding: 1.5rem;
+            overflow-y: scroll !important;
+            color: white;
+            position: relative !important;
+            width: 100% !important;
+        }
+
+        .input-field input[type=text]:focus+label {
+            color: #ff9100 !important;
+        }
+
+        .input-field input[type=text]:focus {
+            border-bottom: 1px solid #ff9100 !important;
+            box-shadow: 0 1px 0 0 #ff9100 !important;
+        }
+
+        .watermark {
+         pointer-events: none;
+            display: block;
+            position: fixed;
+            width: 50%;
+            opacity: 0.3;
+            z-index: 1;
+            height: auto;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body class="blue-grey darken-3">
+<div id="vue-app">
+
+  <div class="row">
+    <div class="blue-grey darken-4" id="chat_div">
+      <img class="watermark" src="https://static.toro.io/marketplace/organisations/organisation_1.png" alt="">
+      <template v-for="msg in message_history">
+        <p class="chat_msg">
+          <em>{{msg.user.firstName}}</em> : {{msg.message}}</p>
+        <br>
+      </template>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col s12 m12 l12">
+      <form @submit.prevent id="chat-form">
+        <div class="input-field">
+          <input class="white-text"
+                 type="text"
+                 placeholder="Send message"
+                 @keyup.enter="sendMessage()"
+                 v-bind:value="message"
+                 v-model="message">
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+</div>
+<!-- end of vue-app -->
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/js/materialize.min.js"></script>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+ 
+    var server = new SockJS('/server');
+
+    var socket = Stomp.over(server);
+
+    var projectId = getQueryString('project');
+
+    socket.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+        //listen
+        socket.subscribe('/listen/projects/' + projectId + "/yuen", function (result) {
+            var body = JSON.parse(result.body);
+            console.log("Receiving :" + body.message);
+            showChatMessage(body);
+        });
+    });
+
+    function showChatMessage(body) {
+        document.getElementById("chat_div").innerHTML += "<p class='chat_msg'><em>" + body.user.firstName +
+            "</em>  : " + body.message + "</p><br>";
+    }
+
+    function getQueryString(field, url) {
+        var href = url ? url : window.location.href;
+        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+        var string = reg.exec(href);
+        return string ? string[1] : null;
+    };
+
+
+    //vue
+    new Vue({
+        el: "#vue-app",
+        data: {
+            message: '',
+            message_history: '',
+            token : JSON.parse(localStorage.getItem('token'))
+        },
+        methods: {
+            sendMessage() {
+                var chatMessage = JSON.stringify({ message :this.message});
+                console.log(JSON.stringify({ message :this.message}));
+
+                     axios({
+                        method: 'post',
+                        url: '/api/v1/projects/'+projectId+'/messages',
+                        data: chatMessage,
+                        headers: {
+                            "Authorization": "Bearer " +  this.token.accessToken,
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then((res) => {
+                        document.getElementById("chat-form").reset();
+                        this.message_history = '';
+                        console.log(res.status, res.data);
+                        var chat_div = document.getElementById("chat_div");
+                        chat_div.scrollTop = chat_div.scrollHeight;
+                        this.message ='';
+                    })
+                    .catch((err) => {
+                        document.getElementById("chat-form").reset();
+                        M.toast({html: "Please login to continue",classes: "orange accent-3 rounded"});
+                    });
+
+
+            },
+            retrieveChatMessage() {
+
+                axios({
+                        method: 'get',
+                        url: '/api/v1/projects/'+projectId+'/messages',
+                        headers: {
+                            "Authorization": "Bearer " + this.token.accessToken,
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then((res) => {
+                        this.message_history = res.data;
+                        var chat_div = document.getElementById("chat_div");
+                        chat_div.scrollTop = chat_div.scrollHeight;
+                    })
+                    .catch((err) => {
+                        document.getElementById("chat-form").reset();
+                        M.toast({html: "Please login to continue",classes: "orange accent-3 rounded"});
+                    });
+
+            }
+        }, //methods
+        mounted() {
+            this.retrieveChatMessage();
+            this.message_history = '';
+        }
+    });
+</script>
+
+</html>

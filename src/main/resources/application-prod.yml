@@ -1,0 +1,21 @@
+spring:
+server:
+  port: 8080
+  host: localhost
+
+  h2:
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+    properties:
+            hibernate:
+              show_sql: true
+              format_sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pairprogram
+    username: postgres
+    password:
+    driver-class-skillName: org.postgresql.Driver

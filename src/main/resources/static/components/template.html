@@ -1,0 +1,23 @@
+<div style="heigth: 100px !important;">
+    <md-table class="blue-grey" md-elevation="0" v-model="searched" md-sort="id" md-sort-order="asc" md-card md-fixed-header style="margin-left: 0px;margin-top: 0px;">
+        <md-table-toolbar>
+            <!--<div class="md-toolbar-section-start">
+                <md-button class="md-icon-button" @click="addUser"><md-icon>add</md-icon><md-icon>folder</md-icon></md-button>
+            </div>-->
+        </md-table-toolbar>
+
+        <md-table-empty-state
+            md-icon="create_new_folder"
+            md-label="No projects found"
+            :md-description="`No project found for this name '${search}'. Try a different search term or create a new project.`">
+            <md-button class="md-primary md-raised" @click="addDialog = true">Create New Project</md-button>
+        </md-table-empty-state>
+
+        <md-table-row slot="md-table-row" slot-scope="{ item }" class="blue-grey">
+            <md-table-cell md-label="ID" md-numeric>{{ item.id }}</md-table-cell>
+            <md-table-cell md-label="Name" md-sort-by="name"><md-icon style="color: #FFC300;">folder</md-icon> {{ item.name }}</md-table-cell>
+            <md-table-cell md-label="Date Modified" md-sort-by="dateModified">{{ item.dateModified }}</md-table-cell>
+            <md-table-cell md-label="Size" md-sort-by="size">{{ item.size }}</md-table-cell>
+        </md-table-row>
+    </md-table>
+</div>

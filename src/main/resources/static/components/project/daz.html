@@ -1,0 +1,82 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/vue-material.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/theme/default.css">
+
+    <style>
+        textarea {
+            white-space: nowrap;
+            resize: none;
+            border: none;
+            height: 100%;
+            width: 100%;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        textarea:focus {
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+<div id="app" style="height: 100%; width: 100%;">
+    <div class="md-layout">
+        <div class="md-layout-item md-size-25">
+            <md-card>
+                <md-card-content style="height: 100%; width: 100%;">
+                    <div style="overflow: auto;">
+                        <div><md-icon style="color: #FFC300">folder</md-icon> project name<md-icon>keyboard_arrow_down</md-icon>
+                            <div style="margin-left: 30; white-space: nowrap;"><md-icon style="color: #FFC300">folder</md-icon> project name<md-icon>keyboard_arrow_down</md-icon>
+                                <div style="margin-left: 30; white-space: nowrap;"><md-icon style="color: #FFC300">folder</md-icon> project name<md-icon>keyboard_arrow_right</md-icon></div>
+                                <div style="margin-left: 30; white-space: nowrap;"><md-icon style="color: #64b5f6 ">description</md-icon> test.php</div>
+                            </div>
+                            <div style="margin-left: 30; white-space: nowrap;"><md-icon style="color: #FFC300">folder</md-icon> project name<md-icon>keyboard_arrow_right</md-icon></div>
+                        </div>
+
+                        <div><md-icon style="color: #64b5f6 ">description</md-icon> test.php</div>
+                    </div>
+                </md-card-content>
+            </md-card>
+        </div>
+        <div class="md-layout-item md-size-75">
+            <md-card>
+                <md-card-content style="height: 100%; width: 100%;">
+                    <textarea v-model="input" @keydown.tab.prevent="addTab"></textarea>
+                </md-card-content>
+            </md-card>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-material@beta"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+        Vue.use(VueMaterial.default);
+
+        new Vue({
+            el: "#app",
+
+            data: {
+                input: ""
+            },
+
+            methods: {
+                addTab() {
+                    this.input += "\t";
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

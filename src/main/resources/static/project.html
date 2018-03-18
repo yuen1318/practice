@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/vue-material.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/theme/default.css">
+  </head>
+
+  <style type="text/css">
+  		body {
+  			background: #EEEEEE;
+  		}
+  	  .page-container {
+    min-height: 300px;
+  	height: 100vh;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(#000, .12);
+  }
+
+
+
+   // Demo purposes only
+  .md-drawer {
+    width: 230px;
+    max-width: calc(100vw - 125px);
+  }
+
+  .md-content {
+  	height: 100%;
+  }
+
+  .md-list-item {
+  	cursor: pointer;
+  }
+
+  .md-list-item:hover {
+  	cursor: pointer;
+  	background: #E0E0E0;
+  }
+
+  .project-dir {
+  	height: 100%;
+  	width: 270px;
+  	overflow-x: auto;
+  	border-right: 1px inset;
+  	border-color: #BDBDBD;
+  }
+
+  .folder {
+  	cursor: pointer;
+  }
+
+  .folder:hover {
+  	background: #E0E0E0;
+  }
+
+  .file {
+  	padding-left: 5px;
+  	cursor: pointer;
+  }
+
+  .file:hover {
+  	background: #E0E0E0;
+  }
+
+  .project-toolbar {
+  	text-align: right;
+  	padding-right: 10px;
+  }
+  </style>
+
+  <body>
+    <div id="app">
+    	<div class="page-container md-layout-column">
+    <md-toolbar class="md-primary" md-elevation="0">
+      <md-button class="md-icon-button" @click="showNavigation = true">
+        <md-icon>menu</md-icon>
+      </md-button>
+      <span class="md-title">My Title</span>
+
+      <div class="md-toolbar-section-end">
+        <md-button @click="showSidepanel = true">Chat</md-button>
+      </div>
+    </md-toolbar>
+
+    <md-drawer :md-active.sync="showNavigation">
+      <md-toolbar class="md-transparent" >
+        <span class="md-title">Project Name</span>
+      </md-toolbar>
+
+      <md-list>
+        <md-list-item>
+          <md-icon>arrow_back</md-icon>
+          <span class="md-list-item-text">Back To Projects</span>
+        </md-list-item>
+
+        <md-list-item>
+          <md-icon>settings</md-icon>
+          <span class="md-list-item-text">Settings</span>
+        </md-list-item>
+
+        <md-list-item>
+          <md-icon>delete</md-icon>
+          <span class="md-list-item-text">Delete</span>
+        </md-list-item>
+      </md-list>
+    </md-drawer>
+
+    <md-drawer class="md-right" :md-active.sync="showSidepanel">
+      <md-toolbar class="md-transparent" md-elevation="0">
+        <span class="md-title">Chat</span>
+      </md-toolbar>
+
+      <md-list>
+        <md-list-item>
+          <span class="md-list-item-text">Abbey Christansen</span>
+
+          <md-button class="md-icon-button md-list-action">
+            <md-icon class="md-primary">chat_bubble</md-icon>
+          </md-button>
+        </md-list-item>
+
+        <md-list-item>
+          <span class="md-list-item-text">Alex Nelson</span>
+
+          <md-button class="md-icon-button md-list-action">
+            <md-icon class="md-primary">chat_bubble</md-icon>
+          </md-button>
+        </md-list-item>
+
+        <md-list-item>
+          <span class="md-list-item-text">Mary Johnson</span>
+
+          <md-button class="md-icon-button md-list-action">
+            <md-icon>chat_bubble</md-icon>
+          </md-button>
+        </md-list-item>
+      </md-list>
+    </md-drawer>
+
+    <md-content>
+      <div class="project-dir">
+      	<md-toolbar class="md-dense" md-elevation="0">
+	      <div class="md-toolbar-section-end">
+	        <md-button class="md-icon-button">
+            <md-icon>create_new_folder</md-icon>
+          </md-button>
+	      </div>
+	    </md-toolbar>
+      	<div class="folder">
+      		<p><md-icon>arrow_right</md-icon><md-icon>folder</md-icon> folder name</p>
+      	</div>
+      	<div class="file">
+      		<p><md-icon>insert_drive_file</md-icon> file name</p>
+      	</div>
+      </div>
+    </md-content>
+  </div>
+    </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-material@beta"></script>
+    <script>
+      Vue.use(VueMaterial.default)
+
+      new Vue({
+        el: '#app',
+        data: {
+        	showNavigation: false,
+      		showSidepanel: false
+        },
+
+        methods: {
+        	alertMe() {
+        		alert("test");
+        	}
+        }
+      })
+    </script>
+  </body>
+</html>

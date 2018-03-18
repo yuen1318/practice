@@ -1,0 +1,5 @@
+spring:
+  profiles:
+    active: dev
+
+secret: qBF9m%?D|Nsi!e|D&n8uPbWSxe=~

@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+	<link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/vue-material.min.css">
+	<link rel="stylesheet" href="https://unpkg.com/vue-material@beta/dist/theme/default.css">
+</head>
+
+<style type="text/css">
+	body {
+		background-image: linear-gradient(to top, #263238 0%, #37474f 100%);
+	}
+
+	.white {
+		color: #ECEFF1 !important;
+	}
+
+	.button-orange {
+		color: #ECEFF1 !important;
+		background-color: #FF9100 !important;
+	}
+
+	.flex-container {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.flex-item {
+		padding: 10px;
+		margin: 10px;
+		background: #ECEFF1;
+		padding: 0 20px 0 20px;
+		cursor: pointer;
+	}
+
+	.flex-item:hover {
+		margin: 10px;
+		background: #B0BEC5;
+		padding: 0 20px 0 20px;
+		cursor: pointer;
+
+	}
+
+	.empty-state {
+		width: 100%;
+	}
+
+	.toolbar {
+		background: #263238 !important;
+	}
+
+	.md-empty-state-label,
+	.md-empty-state-description {
+		color: #bdbdbd;
+	}
+
+	[v-cloak] {
+		display: none;
+	}
+</style>
+
+<body>
+	<div id="app" v-cloak>
+
+		<!-- Toolbar -->
+		<md-toolbar class="md-large toolbar">
+			<div class="md-toolbar-row">
+				<div class="md-toolbar-section-start">
+					<!--<span class="md-title white">{{ user.firstName.toUpperCase() }} {{ user.lastName.toUpperCase() }}</span>-->
+				</div>
+
+				<div class="md-toolbar-section-end">
+					<md-menu>
+						<md-button class="md-icon-button" md-menu-trigger>
+							<md-icon class="white">account_circle</md-icon>
+						</md-button>
+
+						<md-menu-content>
+							<md-menu-item @click="account()">
+								<md-icon>settings</md-icon>
+								<span>Account Settings</span>
+							</md-menu-item>
+
+							<md-menu-item @click="logOut()">
+								<md-icon>power_settings_new</md-icon>
+								<span>Log out</span>
+							</md-menu-item>
+						</md-menu-content>
+					</md-menu>
+				</div>
+			</div>
+
+			<div class="md-toolbar-row md-toolbar-offset">
+				<md-button class="button-orange" @click="createDialog = true">Create Project</md-button>
+			</div>
+		</md-toolbar>
+
+
+		<div class="flex-container">
+
+			<div class="empty-state" v-if="projects.length == 0">
+				<md-empty-state md-icon="create_new_folder" md-label="Create your first project" md-description="Creating project, you'll be able to create one more project.">
+					<md-button class="md-raised button-orange" @click="createDialog = true">Create first project</md-button>
+				</md-empty-state>
+			</div>
+
+			<div class="flex-item" v-for="project in projects" v-else @click="toggleDialog(project.id)">
+				<p>
+					<md-icon>folder</md-icon> {{ project.name }}</p>
+			</div>
+
+		</div>
+
+		<div>
+			<md-dialog-prompt :md-active.sync="createDialog" v-model="proejectName" md-title="Create Project" md-input-maxlength="30"
+			    md-input-placeholder="Type project name..." md-confirm-text="Done" @md-confirm="createProject()" />
+		</div>
+
+	</div>
+
+	<script src="https://unpkg.com/vue"></script>
+	<script src="https://unpkg.com/vue-material@beta"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script>
+		Vue.use(VueMaterial.default)
+
+		new Vue({
+			el: '#app',
+			data: {
+				user: null,
+				token: null,
+				createDialog: false,
+				proejectName: null,
+				projects: []
+			},
+
+			methods: {
+
+				toggleDialog(id) {
+					localStorage.setItem('projectId', id);
+					window.location.href = '/match';
+				},
+
+				account() {
+					window.location.href = "/account";
+				},
+
+				logOut() {
+					localStorage.clear();
+					window.location.href = "/";
+				},
+
+				createProject() {
+					let project = {
+						name: this.proejectName
+					};
+
+					let that = this;
+
+					axios({
+							url: '/api/v1/users/' + this.user.id + '/projects',
+							method: 'post',
+							data: JSON.stringify(project),
+							headers: {
+								"Content-Type": "application/json",
+								"Authorization": "Bearer " + this.token.accessToken
+							}
+						})
+						.then(function (response) {
+							that.projects.push(response.data);
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+
+					this.proejectName = null;
+				}
+			},
+
+			mounted() {
+				let that = this;
+				this.user = JSON.parse(localStorage.getItem("user"));
+				this.token = JSON.parse(localStorage.getItem("token"));
+				if (this.user == null) {
+					window.location.href = "/";
+				} else {
+					axios({
+							url: '/api/v1/users/' + this.user.id + '/projects',
+							method: 'get',
+							headers: {
+								"Content-Type": "application/json",
+								"Authorization": "Bearer " + this.token.accessToken
+							}
+						})
+						.then(function (response) {
+							that.projects = response.data;
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+				}
+			}
+		})
+	</script>
+</body>
+
+</html>

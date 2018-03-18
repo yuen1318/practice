@@ -1,0 +1,25 @@
+.md-app {
+  background: #37474f !important;
+}
+
+.blue-grey {
+  background: #263238 !important;
+}
+
+.white-text {
+  color: #eceff1 !important;
+}
+
+#input-search {
+  color: #eceff1 !important;
+  -webkit-text-fill-color: inherit;
+}
+
+#input-search::placeholder {
+  color: #78909c !important;
+  -webkit-text-fill-color: inherit;
+}
+
+.md-field.md-theme-default:after {
+    background-color: #1976d2 !important;
+}

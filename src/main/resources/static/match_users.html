@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/css/materialize.min.css">
+    <title>Document</title>
+    <style>
+        .chat_msg {
+            color: white;
+            padding: 0.5rem;
+            margin: 0.5rem;
+            display: inline-block;
+            border-radius: 0.5rem;
+            background-color: #ff9100;
+            z-index: 5;
+            position: relative !important;
+        }
+
+        #chat_div {
+            height: 80vh;
+            font-size: 1.3rem;
+            padding: 1.5rem;
+            overflow-y: scroll !important;
+            color: white;
+            position: relative !important;
+            width: 100% !important;
+        }
+
+        .input-field input[type=text]:focus+label {
+            color: #ff9100 !important;
+        }
+
+        .input-field input:focus {
+            border-bottom: 1px solid #ff9100 !important;
+            box-shadow: 0 1px 0 0 #ff9100 !important;
+        }
+
+        .input-field input {
+            color: white;
+        }
+
+
+
+
+        .watermark {
+            pointer-events: none;
+            display: block;
+            position: fixed;
+            width: 50%;
+            opacity: 0.3;
+            z-index: 1;
+            height: auto;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body class="blue-grey lighten-5">
+
+
+
+    <div id="account">
+        <nav>
+            <div class="nav-wrapper blue-grey darken-3">
+                <a href="#" class="brand-logo">
+                    <small>&emsp;Possible Matches</small>
+                </a>
+                <ul class="right">
+                    <li>
+                        <a href="/projects">Projects</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <br>
+        <div class="container">
+                <table class="bordered striped centered responsive-table">
+                        <thead>
+                          <tr>
+                              <th>Name</th>
+                              <th>Language</th>
+                              <th>Time Zone</th>
+                              <th>Working Time</th>
+                              <th>Skills</th>
+                          </tr>
+                        </thead>
+                
+                        <tbody>
+
+                          <tr v-for ="pm in match">
+                            <td>{{pm.firstName}} {{pm.lastName}} </td>
+                            <td>
+                                <p v-for ="lang in pm.languages" > 
+                                    {{lang.name}}
+                                </p>
+                            </td>
+                            <td>{{pm.workShift.timeZone}}</td>
+                            <td>{{convertToTime(pm.workShift.startTime)}} - {{convertToTime(pm.workShift.endTime)}}</td>
+                            <td>
+                                <p v-for ="skill in pm.skills">
+                                    {{skill.name}} : {{skill.level}}
+                                </p>
+                            </td>
+                          </tr>
+                         
+                        </tbody>
+                      </table>
+        </div>
+
+
+    </div>
+
+
+    <!-- end of vue-app -->
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.3/js/materialize.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.rawgit.com/auth0/jwt-decode/master/build/jwt-decode.min.js"></script>
+<script>
+    new Vue({
+        el: "#account",
+        data: {
+            match: ''
+        },
+        methods: {
+            convertToTime(milliseconds){
+                return new Date(milliseconds).toLocaleTimeString('en-US');
+            },
+            checkIfLogin(){
+			var user = localStorage.getItem("user");
+			if(user == null)  
+				window.location.href = "/";
+            },
+            getMatch(){
+                var user_data = JSON.parse(localStorage.getItem('user'));
+                var token = JSON.parse(localStorage.getItem("token"));
+                var user_id = user_data.id;
+                var projectId = localStorage.getItem('projectId');
+                let that = this;
+                axios({
+                        method: 'get',
+                        url: `/api/v1/users/${user_id}/projects/${projectId}/matching`,
+                        headers: {
+                            "Authorization": "Bearer " + token.accessToken
+                        }
+                    })
+                    .then((res) => {
+                        that.match = res.data;
+                        console.dir(res.data);
+                    })
+                    .catch((err) => {
+                        console.dir(err);
+                        var errorMessage = err  ;
+                        this.makeToast(errorMessage, "red darken-1");
+                    });
+            }
+        },
+        beforeMount(){
+            this.checkIfLogin();
+        },
+        mounted() {
+            this.getMatch();
+        }
+
+    });
+</script>
